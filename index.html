@@ -7,22 +7,22 @@
     <style>
         /* 🌸 PASTEL THEME COLORS */
         :root {
-            --primary-color: #A2D2FF; /* Soft Sky Blue */
-            --accent-color: #FFC8DD; /* Pale Pink */
+            --primary-color: #A2D2FF; 
+            --accent-color: #FFC8DD; 
             --text-color: #000000; /* BLACK for maximum contrast */
-            --subtle-text-color: #333333; /* Dark Gray for secondary text */
-            --container-bg-start: rgba(255, 255, 255, 0.5); /* Lighter for glass effect */
-            --container-bg-end: rgba(255, 255, 255, 0.85); /* Input fields background */
-            --border-color: rgba(255, 255, 255, 0.4); /* Frosted Glass Border */
-            --button-color: #FFA5AB; /* Medium Pink Button (remains pink) */
+            --subtle-text-color: #333333; 
+            --container-bg-start: rgba(255, 255, 255, 0.5); 
+            --container-bg-end: rgba(255, 255, 255, 0.85); 
+            --border-color: rgba(255, 255, 255, 0.4); 
+            --button-color: #FFA5AB; 
         }
 
-        /* 🖼️ BACKGROUND IMAGE IMPLEMENTATION */
+        /* 🖼️ BASE STYLES */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            color: var(--subtle-text-color); /* General body text is dark gray */
+            color: var(--subtle-text-color);
             background-image: url('B.PNG'); 
             background-size: cover;
             background-attachment: fixed;
@@ -36,9 +36,8 @@
             padding: 50px 0;
         }
         
-        /* ✍️ TEXT AND HEADER STYLING */
         h1, h2 {
-            color: var(--text-color); /* Black Headers */
+            color: var(--text-color);
             border-bottom: 1px solid var(--accent-color);
             padding-bottom: 8px;
             margin-top: 25px;
@@ -80,7 +79,7 @@
             border-radius: 8px;
             box-sizing: border-box;
             background-color: var(--container-bg-end);
-            color: var(--text-color); /* Black input text */
+            color: var(--text-color);
             font-size: 16px;
             transition: border-color 0.3s;
         }
@@ -94,7 +93,7 @@
         
         /* 🔘 BUTTON STYLING */
         button {
-            background-color: var(--button-color); /* Pink Button */
+            background-color: var(--button-color);
             color: white;
             padding: 12px 25px;
             border: none;
@@ -103,35 +102,59 @@
             margin-top: 25px;
             font-size: 17px;
             font-weight: bold;
+            width: 100%; /* Full width on mobile/small screens */
             transition: background-color 0.3s, transform 0.1s;
         }
         button:hover {
-            background-color: #E08A90; /* Darker pink on hover */
+            background-color: #E08A90; 
             transform: translateY(-2px);
         }
         
-        /* 🚫 PASSWORD STYLING */
-        #error-message {
-            color: var(--text-color); /* Black error message */
-            margin-top: 10px;
+        /* 💤 SLEEP SECTION STYLING */
+        #sleep-duration, #sleep-window {
             font-weight: bold;
+            color: var(--text-color); 
         }
         
-        /* 📋 OUTPUT STYLING */
-        #output-log {
-            height: 250px;
-            font-family: monospace;
-            background-color: var(--input-bg);
-            border: 1px solid #ccc;
-        }
-        #sleep-duration {
-            font-weight: bold;
-            color: var(--text-color); /* Black sleep duration text */
-            margin-left: 10px;
-        }
         hr {
             border-color: var(--accent-color);
             opacity: 0.5;
+        }
+        
+        /* 📱 MOBILE OPTIMIZATIONS (For screens 600px wide or less) */
+        @media (max-width: 600px) {
+            
+            /* Reduce overall padding and margins to save screen space */
+            #password-container, #log-container {
+                padding: 25px 20px;
+                margin: 15px;
+                width: 95%; 
+            }
+
+            h1 {
+                font-size: 1.6em;
+            }
+            h2 {
+                font-size: 1.3em;
+            }
+
+            /* Make the sleep info stack nicely */
+            #sleep-window-info {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            /* Ensure input fields and buttons don't have unnecessary max widths */
+            input[type="text"], input[type="time"], textarea {
+                font-size: 14px;
+            }
+
+            /* Make the button size better for tapping on mobile */
+            button {
+                padding: 15px 20px;
+                font-size: 16px;
+            }
         }
     </style>
 </head>
@@ -163,12 +186,16 @@
         <label for="wake-time">Woke Up (e.g., 8:00 AM):</label>
         <input type="time" id="wake-time" value="08:00" onchange="calculateSleep()">
         
-        <p style="margin-top: 20px;">
-            Sleep Window: 
-            <span id="sleep-window">--</span>
-            | Duration:
-            <span id="sleep-duration">--</span>
-        </p>
+        <div id="sleep-window-info" style="margin-top: 20px;">
+            <p style="margin: 5px 0;">
+                Sleep Window: 
+                <span id="sleep-window">--</span>
+            </p>
+            <p style="margin: 5px 0;">
+                Duration:
+                <span id="sleep-duration">--</span>
+            </p>
+        </div>
 
         <hr>
 
@@ -200,8 +227,7 @@
             const minutes = minuteStr;
             const ampm = hour >= 12 ? 'PM' : 'AM';
             hour = hour % 12;
-            hour = hour ? hour : 12; // The hour '0' should be '12'
-            // Ensures single digit hours don't have a leading zero (e.g., 9:30 AM, not 09:30 AM)
+            hour = hour ? hour : 12;
             return hour + ':' + minutes + ' ' + ampm;
         }
 
@@ -221,17 +247,13 @@
             const sleepParts = sleepTimeInput.split(':').map(Number);
             const wakeParts = wakeTimeInput.split(':').map(Number);
             
-            // Create Date objects for calculation. Use arbitrary dates (Jan 1)
             let sleepDate = new Date(2000, 0, 1, sleepParts[0], sleepParts[1]);
             let wakeDate = new Date(2000, 0, 1, wakeParts[0], wakeParts[1]);
 
-            // If sleep time is later than wake time (i.e., slept through midnight)
             if (sleepDate.getTime() > wakeDate.getTime()) {
-                // Add 1 day (24 hours * 60 min * 60 sec * 1000 ms) to the wake date
                 wakeDate.setDate(wakeDate.getDate() + 1); 
             }
 
-            // Calculate difference in milliseconds
             const diffMs = wakeDate.getTime() - sleepDate.getTime();
             
             if (diffMs < 0) {
@@ -240,14 +262,11 @@
                  return;
             }
 
-            // Convert milliseconds to hours and minutes
             const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
             const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 
-            // Update display spans
             durationSpan.textContent = `${diffHours} hr ${diffMinutes} min`;
             
-            // Generate the sleep window text with AM/PM
             const sleepTime12 = formatTo12Hour(sleepTimeInput);
             const wakeTime12 = formatTo12Hour(wakeTimeInput);
             windowSpan.textContent = `${sleepTime12} to ${wakeTime12}`;
@@ -261,7 +280,6 @@
             day: 'numeric'
         });
         
-        // Run sleep calculation on load to show initial values
         window.onload = calculateSleep;
 
         // 🔒 Password Check Function
@@ -288,7 +306,6 @@
             const sleepDuration = document.getElementById('sleep-duration').textContent;
             const sleepWindow = document.getElementById('sleep-window').textContent;
 
-            // Format the final output
             const logOutput = 
                 `--- 📅 DAILY LOCK IN REPORT ---
 Date: ${date}
