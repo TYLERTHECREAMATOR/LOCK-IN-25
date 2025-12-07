@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>25-26 Lock In Log</title>
+    <style>
+        /* 🌸 PASTEL THEME COLORS */
+        :root {
+            --primary-color: #A2D2FF; /* Soft Sky Blue */
+            --accent-color: #FFC8DD; /* Pale Pink */
+            --text-color: #000000; /* BLACK for maximum contrast */
+            --subtle-text-color: #333333; /* Dark Gray for secondary text */
+            --container-bg-start: rgba(255, 255, 255, 0.5); /* Lighter for glass effect */
+            --container-bg-end: rgba(255, 255, 255, 0.85); /* Input fields background */
+            --border-color: rgba(255, 255, 255, 0.4); /* Frosted Glass Border */
+            --button-color: #FFA5AB; /* Medium Pink Button (remains pink) */
+        }
+
+        /* 🖼️ BACKGROUND IMAGE IMPLEMENTATION */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--subtle-text-color); /* General body text is dark gray */
+            background-image: url('B.PNG'); 
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            min-height: 100vh;
+            
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 50px 0;
+        }
+        
+        /* ✍️ TEXT AND HEADER STYLING */
+        h1, h2 {
+            color: var(--text-color); /* Black Headers */
+            border-bottom: 1px solid var(--accent-color);
+            padding-bottom: 8px;
+            margin-top: 25px;
+        }
+        
+        /* 💎 FROSTED GLASS CONTAINER STYLING */
+        #password-container, #log-container {
+            background: var(--container-bg-start);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 700px;
+            margin: 20px;
+        }
+
+        /* 🔒 Lock Screen Specific Centering */
+        #password-container {
+            max-width: 400px;
+            padding: 60px 40px;
+        }
+
+        /* 📝 INPUT AND FORM STYLING */
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 600;
+            color: var(--subtle-text-color);
+        }
+        input[type="text"], input[type="time"], textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            background-color: var(--container-bg-end);
+            color: var(--text-color); /* Black input text */
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus, textarea:focus {
+            border-color: var(--button-color);
+            outline: none;
+        }
+        textarea {
+            resize: vertical;
+        }
+        
+        /* 🔘 BUTTON STYLING */
+        button {
+            background-color: var(--button-color); /* Pink Button */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 25px;
+            font-size: 17px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        button:hover {
+            background-color: #E08A90; /* Darker pink on hover */
+            transform: translateY(-2px);
+        }
+        
+        /* 🚫 PASSWORD STYLING */
+        #error-message {
+            color: var(--text-color); /* Black error message */
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        /* 📋 OUTPUT STYLING */
+        #output-log {
+            height: 250px;
+            font-family: monospace;
+            background-color: var(--input-bg);
+            border: 1px solid #ccc;
+        }
+        #sleep-duration {
+            font-weight: bold;
+            color: var(--text-color); /* Black sleep duration text */
+            margin-left: 10px;
+        }
+        hr {
+            border-color: var(--accent-color);
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="password-container">
+        <h2>🔒 25-26 Lock In Access</h2>
+        <label for="password">Access Code:</label>
+        <input 
+            type="text" 
+            id="password" 
+            placeholder="If you don't know this you shouldn't be here!" 
+            autofocus
+            autocomplete="off">
+        <button onclick="checkPassword()">Enter Lock In</button>
+        <p id="error-message" style="display: none;">Incorrect Access Code. Try again.</p>
+    </div>
+
+    <div id="log-container" style="display: none;">
+        <h1>🗓️ Daily Lock In Report</h1>
+        <p>Current Date: <strong id="current-date"></strong></p>
+
+        <hr>
+
+        <h2>💤 Sleep Log</h2>
+        <label for="sleep-time">Went to Sleep (e.g., 11:00 PM):</label>
+        <input type="time" id="sleep-time" value="23:00" onchange="calculateSleep()">
+
+        <label for="wake-time">Woke Up (e.g., 8:00 AM):</label>
+        <input type="time" id="wake-time" value="08:00" onchange="calculateSleep()">
+        
+        <p style="margin-top: 20px;">
+            Sleep Window: 
+            <span id="sleep-window">--</span>
+            | Duration:
+            <span id="sleep-duration">--</span>
+        </p>
+
+        <hr>
+
+        <h2>🍽️ Food Log</h2>
+        <label for="food-entry">What I Ate (Time/AM/PM: Item, e.g., 8:00 AM: Oatmeal, 1:00 PM: Salad):</label>
+        <textarea id="food-entry" rows="4" placeholder="Enter each meal and snack here, using 12-hour time."></textarea>
+
+        <hr>
+
+        <h2>✍️ Activity Log</h2>
+        <label for="activity-entry">What I Did (Time/AM/PM: Activity, e.g., 9:00 AM: Started Work, 7:00 PM: Gym):</label>
+        <textarea id="activity-entry" rows="6" placeholder="Enter each major activity and its time here, using 12-hour time."></textarea>
+
+        <button onclick="generateLog()">Generate & Copy Log</button>
+        
+        <hr>
+
+        <h2>📋 Your Generated Report</h2>
+        <textarea id="output-log" readonly placeholder="Your structured report will appear here. It's automatically copied to your clipboard when you click 'Generate & Copy Log'."></textarea>
+
+    </div>
+
+    <script>
+        // Helper function to format 24-hour time (HH:MM) to 12-hour time (H:MM AM/PM)
+        function formatTo12Hour(time24) {
+            if (!time24) return '--';
+            const [hourStr, minuteStr] = time24.split(':');
+            let hour = parseInt(hourStr, 10);
+            const minutes = minuteStr;
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            hour = hour % 12;
+            hour = hour ? hour : 12; // The hour '0' should be '12'
+            // Ensures single digit hours don't have a leading zero (e.g., 9:30 AM, not 09:30 AM)
+            return hour + ':' + minutes + ' ' + ampm;
+        }
+
+        // 💤 Sleep Calculation Function
+        function calculateSleep() {
+            const sleepTimeInput = document.getElementById('sleep-time').value;
+            const wakeTimeInput = document.getElementById('wake-time').value;
+            const durationSpan = document.getElementById('sleep-duration');
+            const windowSpan = document.getElementById('sleep-window');
+
+            if (!sleepTimeInput || !wakeTimeInput) {
+                durationSpan.textContent = '--';
+                windowSpan.textContent = '--';
+                return;
+            }
+
+            const sleepParts = sleepTimeInput.split(':').map(Number);
+            const wakeParts = wakeTimeInput.split(':').map(Number);
+            
+            // Create Date objects for calculation. Use arbitrary dates (Jan 1)
+            let sleepDate = new Date(2000, 0, 1, sleepParts[0], sleepParts[1]);
+            let wakeDate = new Date(2000, 0, 1, wakeParts[0], wakeParts[1]);
+
+            // If sleep time is later than wake time (i.e., slept through midnight)
+            if (sleepDate.getTime() > wakeDate.getTime()) {
+                // Add 1 day (24 hours * 60 min * 60 sec * 1000 ms) to the wake date
+                wakeDate.setDate(wakeDate.getDate() + 1); 
+            }
+
+            // Calculate difference in milliseconds
+            const diffMs = wakeDate.getTime() - sleepDate.getTime();
+            
+            if (diffMs < 0) {
+                 durationSpan.textContent = 'Error';
+                 windowSpan.textContent = 'Error';
+                 return;
+            }
+
+            // Convert milliseconds to hours and minutes
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+            // Update display spans
+            durationSpan.textContent = `${diffHours} hr ${diffMinutes} min`;
+            
+            // Generate the sleep window text with AM/PM
+            const sleepTime12 = formatTo12Hour(sleepTimeInput);
+            const wakeTime12 = formatTo12Hour(wakeTimeInput);
+            windowSpan.textContent = `${sleepTime12} to ${wakeTime12}`;
+        }
+
+        // Set the current date when the page loads
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        // Run sleep calculation on load to show initial values
+        window.onload = calculateSleep;
+
+        // 🔒 Password Check Function
+        function checkPassword() {
+            const passwordInput = document.getElementById('password').value;
+            const passwordContainer = document.getElementById('password-container');
+            const logContainer = document.getElementById('log-container');
+            const errorMessage = document.getElementById('error-message');
+
+            if (passwordInput === "GZ") {
+                passwordContainer.style.display = 'none';
+                logContainer.style.display = 'block';
+            } else {
+                errorMessage.style.display = 'block';
+                document.getElementById('password').value = '';
+            }
+        }
+
+        // 📋 Generate Log Function
+        function generateLog() {
+            const date = document.getElementById('current-date').textContent;
+            const foodEntry = document.getElementById('food-entry').value;
+            const activityEntry = document.getElementById('activity-entry').value;
+            const sleepDuration = document.getElementById('sleep-duration').textContent;
+            const sleepWindow = document.getElementById('sleep-window').textContent;
+
+            // Format the final output
+            const logOutput = 
+                `--- 📅 DAILY LOCK IN REPORT ---
+Date: ${date}
+
+--- 💤 SLEEP ---
+Time Window: ${sleepWindow}
+Duration: ${sleepDuration}
+
+--- 🍽️ FOOD LOG ---
+${foodEntry}
+
+--- ✍️ ACTIVITY LOG ---
+${activityEntry}
+----------------------------------`;
+
+            document.getElementById('output-log').value = logOutput;
+            
+            // Automatically copy to clipboard
+            const outputLog = document.getElementById('output-log');
+            outputLog.select();
+            outputLog.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            alert('Report copied to clipboard! Paste it into your personal file.');
+        }
+    </script>
+
+</body>
+</html>
